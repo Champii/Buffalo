@@ -3,15 +3,20 @@ require! fs
 gram-items = {}
 
 gram-symbol-repeter = ->
-  repeter: it[*-1]
-  symbol: it[0 til -1]*''
+
 
 gram-line-parse = ->
-  | it.0 is '"'           =>
-    # log 'line parse' it, literal: it[1 til -1]*''
-    literal: it[1 til -1]*''
-  | it[*-1] in <[ + * ]>  => gram-symbol-repeter it
-  | _                     => symbol: it
+  res = {}
+  if it.0 is '"'
+    res = literal: it[1 to elem-index \" tail it]*''
+  else
+    res = symbol: it
+  if it[*-1] in <[ + * ? ]>
+    res <<< repeter: it[*-1]
+    if res.symbol?
+      res.symbol = res.symbol[0 til -1]*''
+
+  res
 
 gram-or = ->
   res = []

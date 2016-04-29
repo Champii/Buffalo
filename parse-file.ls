@@ -10,7 +10,7 @@ module.exports = (filename, grammar, done) ->
 
     file-parse-literal = ->
       return false if not buff.length
-      # log 'BUFF LENGTH', buff.length
+      /*log 'BUFF LENGTH', buff, buff.length, it.length, it*/
       file-literal = buff.slice 0, it.length
       # log 'Literal' file-literal, file-literal.toString!
       # log buff.length, it.length
@@ -18,32 +18,33 @@ module.exports = (filename, grammar, done) ->
         buff := buff.slice file-literal.length
         return literal: file-literal.toString!
 
-      throw 'Unexpected literal: "' + file-literal.toString! + '". Expected: "' + it + '"'
+      /*throw 'Unexpected literal: "' + file-literal.toString! + '". Expected: "' + it + '"'*/
+      false
 
     file-parse-or = ->
       return false if not buff.length
       # log 'or'
       for item in it
-        try
-          if file-parse-item item
-            return that
+        if file-parse-item item
+          return that
 
       # throw "OR: Unexpected literal at: #{buff.toString!slice 0 10}"
       false
 
     file-parse-repeter = ->
-      log 'REPETER' it
-      if it.repeter is \*
-        while file-parse-item symbol: it.symbol
-          log '--REPEAT' it, inspect that
-          # break if not a
+      repeter = it.repeter
+      obj = {} <<< it
+      delete obj.repeter
+      if repeter is \*
+        while file-parse-item obj
           that
-        # log 'OUT'
+      else if repeter is \?
+        if file-parse-item obj
+          that
       else
         false
 
     file-parse-item = ->
-      log 'Parse Item' it
       switch
         | it.repeter?   => file-parse-repeter it
         | it.symbol?    => file-parse-symbol it.symbol
@@ -62,7 +63,6 @@ module.exports = (filename, grammar, done) ->
           it.literal += item.literal
 
     file-parse-symbol = (symbol = \S) ->
-      log 'Parse Symbol', symbol
       res =
         symbol: symbol
         literal: ''
