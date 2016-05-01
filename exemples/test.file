@@ -1,4 +1,4 @@
-aff 65 eax
+aff 65 [eax]
 aff 65
 aff 67
 jump ip

@@ -34,7 +34,7 @@ gram-or = ->
       i++
   res
 
-gram-escape-space = ->
+gram-escape = ->
   res = new Buffer it.length
   open = false
   for l, i in it
@@ -42,18 +42,21 @@ gram-escape-space = ->
       open = !open
     if open and l is ' '
       res.writeUInt8 1, i
+    else if open and l is '='
+      res.writeUInt8 2, i
     else
       res.writeUInt8 l.charCodeAt(0), i
   res.toString!replace /\\n/g, '\n'
 
-gram-unescape-space = ->
+gram-unescape = ->
   it |> map ->
     | '\u0001' in it  => it.replace /\001/g, ' '
+    | '\u0002' in it  => it.replace /\002/g, '='
     | _               => it
 
 gram-line-decl = ->
-  parts = it.split \=
-  gram-items[parts.0] = gram-or map gram-line-parse, gram-unescape-space gram-escape-space(parts.1).split ' '
+  parts = gram-unescape gram-escape(it).split ': '
+  gram-items[parts.0] = gram-or map gram-line-parse, gram-unescape gram-escape(parts.1).split ' '
 
 module.exports = (filename, done) ->
   fs.read-file filename, (err, buff) ->

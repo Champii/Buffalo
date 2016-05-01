@@ -2,6 +2,7 @@ require! fs
 
 module.exports = (filename, grammar, done) ->
 
+  mustFail = true
   fs.read-file filename, (err, buff) ->
     return done err if err?
 
@@ -38,6 +39,13 @@ module.exports = (filename, grammar, done) ->
       if repeter is \*
         while file-parse-item obj
           that
+      else if repeter is \+
+        a = file-parse-item obj
+        /*console.log \REPETER+ a*/
+        throw "Repeter: '+' => Must appear at least once : #{JSON.stringify obj}" if not a
+        do
+          a
+        while a = file-parse-item obj
       else if repeter is \?
         if file-parse-item obj
           that
@@ -45,11 +53,10 @@ module.exports = (filename, grammar, done) ->
         false
 
     file-parse-item = ->
-      switch
-        | it.repeter?   => file-parse-repeter it
-        | it.symbol?    => file-parse-symbol it.symbol
-        | it.or?        => file-parse-or it.or
-        | it.literal?   => file-parse-literal it.literal
+      | it.repeter?   => file-parse-repeter it
+      | it.symbol?    => file-parse-symbol it.symbol
+      | it.or?        => file-parse-or it.or
+      | it.literal?   => file-parse-literal it.literal
         # | _             => log 'PAS SYMBOL', it; false
 
     not-empty = ->
