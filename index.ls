@@ -17,7 +17,7 @@ module.exports = (grammarPath, filePath, done) ->
 
       done parsed
 
-module.exports \./test.gra \./test.file ->
+/*module.exports \./test.gra \./test.file ->
   inspect it
 
   tabs = 0
@@ -33,4 +33,4 @@ module.exports \./test.gra \./test.file ->
             parse it
         tabs := tabs - 2
 
-  parse it
+  parse it*/
