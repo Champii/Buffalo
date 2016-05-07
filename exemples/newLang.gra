@@ -1,12 +1,11 @@
-S: "ab" "cd"
-
-
+S: Block+
 Block: Expression+
-Expression: Tab* Var | Assign Delimiter
+Expression: Var | Assign Delimiter
 Assign: Var " "* "=" " "* Value
 Var: Alphanum*
-Value: Var | Literal
+Value: Var | Literal | Deref
 Literal: "'" Alphanum* "'"
+Deref: "[" Var | Literal "]"
 
 Tab: "  "
 Delimiter: "\n" | ";"

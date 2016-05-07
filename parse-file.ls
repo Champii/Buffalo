@@ -9,29 +9,28 @@ module.exports = (buff, grammar, done) ->
 
   file-parse-literal = ->
     throw new Error 'Unexpected end of file' if not buff.length
-    /*log 'BUFF LENGTH', buff, buff.length, it.length, it*/
+
     file-literal = buff.slice 0, it.length
-    # log 'Literal' file-literal, file-literal.toString!
-    # log buff.length, it.length
+
     if file-literal.toString! is it
       buff := buff.slice file-literal.length
       return literal: file-literal.toString!
 
-    throw 'Unexpected literal: "' + file-literal.toString! + '". Expected: "' + it + '"'
-    false
+    throw new Error 'Unexpected literal: "' + file-literal.toString! + '". Expected: "' + it + '" at "' + buff + '"'
 
   file-parse-or = ->
-    return false if not buff.length
-    # log 'or'
+    throw new Error 'Unexpected end of file' if not buff.length
+
     for item in it
+      /*b = Buffer.from buff*/
       try
         if file-parse-item item
           return that
       catch e
+        /*buff := b*/
         continue
 
-    throw "OR: Unexpected literal at: '#{buff.toString!slice 0 10}'"
-    false
+    throw new Error "OR: Unexpected literal at: '#{buff.toString!slice 0 10}'"
 
   file-parse-repeter = ->
     repeter = it.repeter
@@ -44,21 +43,18 @@ module.exports = (buff, grammar, done) ->
           save.push that
           that
       catch e
-        console.log \ERROR_REPETER e, it, save
         return save
 
     else if repeter is \+
       save = []
       save.push file-parse-item obj
-      /*console.log \REPETER+ a*/
-      console.log \SAVE save
-      throw "Repeter: '+' => Must appear at least once : #{JSON.stringify obj}" if not save.length
+
+      throw new Error "Repeter: '+' => Must appear at least once : #{JSON.stringify obj}" if not save.length
       try
         while file-parse-item obj
           save.push that
         save
       catch e
-        console.log \ERROR_REPETER3 e, it, save
         return save
 
     else if repeter is \?
@@ -66,7 +62,6 @@ module.exports = (buff, grammar, done) ->
         if file-parse-item obj
           that
       catch e
-        console.log \ERROR_REPETER2 e, it
         return false
     else
       false
@@ -105,7 +100,7 @@ module.exports = (buff, grammar, done) ->
   try
     ast = file-parse-symbol!
   catch e
-    return done e
+    return done new Error e
 
   if buff.length
     return done new Error "Expected end of file: #{buff}"

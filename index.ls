@@ -13,7 +13,7 @@ module.exports = (grammarPath, filePath, done) ->
     inspect \Grammar: grammar
 
     fs.read-file filePath, (err, buff) ->
-      return done err if err?
+      return done new Error err if err?
       return done new Error "File empty: #{filename}" if not buff.length
 
       if buff[*-1] is 10
