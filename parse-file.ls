@@ -21,15 +21,17 @@ module.exports = (buff, grammar, done) ->
   file-parse-or = ->
     throw new Error 'Unexpected end of file' if not buff.length
 
+    orig = Buffer.from buff
     for item in it
-      /*b = Buffer.from buff*/
+      b = Buffer.from buff
       try
         if file-parse-item item
           return that
       catch e
-        /*buff := b*/
+        buff := b
         continue
 
+    buff := orig
     throw new Error "OR: Unexpected literal at: '#{buff.toString!slice 0 10}'"
 
   file-parse-repeter = ->

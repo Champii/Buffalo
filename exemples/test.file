@@ -1,4 +1,3 @@
-aff 65 [eax]
-aff 65
-aff 67
-jump ip
+put 31 a
+put 48 [a]
+aff [a]

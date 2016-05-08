@@ -58,6 +58,53 @@ gram-line-decl = ->
   parts = gram-unescape gram-escape(it).split ': '
   gram-items[parts.0] = gram-or map gram-line-parse, gram-unescape gram-escape(parts.1).split ' '
 
+stdGram =
+  Alphanum: [
+    or:
+      * symbol: 'Letter'
+      * symbol: 'Digit']
+  Letter: [
+    or:
+      * literal: "a"
+      * literal: "b"
+      * literal: "c"
+      * literal: "d"
+      * literal: "e"
+      * literal: "f"
+      * literal: "g"
+      * literal: "h"
+      * literal: "i"
+      * literal: "j"
+      * literal: "k"
+      * literal: "l"
+      * literal: "m"
+      * literal: "n"
+      * literal: "o"
+      * literal: "p"
+      * literal: "q"
+      * literal: "r"
+      * literal: "s"
+      * literal: "t"
+      * literal: "u"
+      * literal: "v"
+      * literal: "w"
+      * literal: "x"
+      * literal: "y"
+      * literal: "z"]
+  Digit: [
+    or:
+      * literal: "0"
+      * literal: "1"
+      * literal: "2"
+      * literal: "3"
+      * literal: "4"
+      * literal: "5"
+      * literal: "6"
+      * literal: "7"
+      * literal: "8"
+      * literal: "9"]
+
+
 module.exports = (filename, done) ->
   fs.read-file filename, (err, buff) ->
     return done err if err?
@@ -65,5 +112,5 @@ module.exports = (filename, done) ->
     lines = buff.to-string!split \\n |> filter (.0 isnt '#' and it.length)
 
     each gram-line-decl, lines
-    done null, gram-items
+    done null, stdGram <<< gram-items
     # inspect gram-items

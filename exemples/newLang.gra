@@ -1,11 +1,13 @@
-S: Block+
-Block: Expression+
-Expression: Var | Assign Delimiter
+S: Block
+Block: Tab* "{" "\n"? Expression+ Tab* "}" "\n"?
+Expression: Tab* Assign | Var Delimiter
 Assign: Var " "* "=" " "* Value
-Var: Alphanum*
-Value: Var | Literal | Deref
-Literal: "'" Alphanum* "'"
+Var: Letter Alphanum*
+Value: Var | Literal | Func | Deref
+Literal: String | Digit+
+String: "'" Alphanum* "'"
 Deref: "[" Var | Literal "]"
+Func: "->" " "* Expression
 
 Tab: "  "
 Delimiter: "\n" | ";"

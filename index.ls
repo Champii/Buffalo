@@ -21,21 +21,15 @@ module.exports = (grammarPath, filePath, done) ->
 
       parse-file buff, grammar, done
 
-module.exports \./exemples/newLang.gra \./exemples/newLang.file ->
-  inspect it, &1
+/*module.exports \./exemples/test.gra \./exemples/test.file ->
 
-#  tabs = 0
-#  parse = ->
-#    /*console.log 'PARSE' it*/
-#    it.value
-#      |> filter -> it.symbol not in <[ Alphanum Letter Digit ]>
-#      |> map ->
-#        it = it.value.0 if it.symbol is \Value
-#        tabs := tabs + 2
-#        res = switch
-#          | it.symbol? =>
-#            console.log [til tabs].map(-> ' ')*'', it.symbol#, '  ', it.literal
-#            parse it
-#        tabs := tabs - 2
+  epureAst = ->
+    it.value = it.value
+      |> filter -> it.symbol not in <[ Alphanum Digit Letter ]>
+      |> filter -> not (it.literal? and keys it .length is 1)
+      |> map -> epureAst it
+    if not it.value.length
+      delete it.value
+    it
 
-#  parse it
+  inspect it, epureAst &1*/

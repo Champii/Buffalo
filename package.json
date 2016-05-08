@@ -1,8 +1,8 @@
 {
-  "name": "parse-generator",
+  "name": "buffalo",
   "version": "0.0.1",
-  "description": "Grammar parser generator (CFG)",
-  "main": "index.js",
+  "description": "Grammar parser (CFG)",
+  "main": "index.ls",
   "directories": {
     "test": "tests"
   },
@@ -17,12 +17,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Champii/Parser-Generator.git"
+    "url": "git+https://github.com/Champii/Buffalo.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Champii<contat@champii.io>",
+  "license": "GPLv2",
   "bugs": {
-    "url": "https://github.com/Champii/Parser-Generator/issues"
+    "url": "https://github.com/Champii/Buffalo/issues"
   },
-  "homepage": "https://github.com/Champii/Parser-Generator#readme"
+  "homepage": "https://github.com/Champii/Buffalo#readme"
 }
