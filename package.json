@@ -1,5 +1,5 @@
 {
-  "name": "buffalo",
+  "name": "tiny-parser",
   "version": "0.0.1",
   "description": "Grammar parser (CFG)",
   "main": "index.ls",
@@ -17,12 +17,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Champii/Buffalo.git"
+    "url": "git+https://github.com/Champii/Tiny.git"
   },
   "author": "Champii<contat@champii.io>",
   "license": "GPLv2",
   "bugs": {
-    "url": "https://github.com/Champii/Buffalo/issues"
+    "url": "https://github.com/Champii/Tiny/issues"
   },
-  "homepage": "https://github.com/Champii/Buffalo#readme"
+  "homepage": "https://github.com/Champii/Tiny#readme"
 }
