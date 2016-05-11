@@ -21,7 +21,7 @@ module.exports = (grammarPath, filePath, done) ->
 
       parse-file buff, grammar, done
 
-/*module.exports \./exemples/test.gra \./exemples/test.file ->
+/*module.exports \./exemples/newLang.gra \./exemples/newLang.file ->
 
   epureAst = ->
     it.value = it.value
