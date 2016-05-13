@@ -68,7 +68,6 @@ module.exports = (buff, grammar, done) ->
     else
       false
 
-
   file-parse-item = ->
     | it.repeter?   => file-parse-repeter it
     | it.symbol?    => file-parse-symbol it.symbol

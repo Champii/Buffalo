@@ -106,16 +106,16 @@ describe 'Parsing' ->
         * symbol: 'LETTER'
         * symbol: 'NUMBER'
       LETTER: [literal: 'a']
-      NUMBER: [literal: '1']
+      NUMBER: [literal: '0']
 
     expected =
       symbol: 'S'
-      literal: 'a1'
+      literal: 'a0'
       value:
         * symbol: 'LETTER' literal: 'a' value: [literal: 'a']
-        * symbol: 'NUMBER' literal: '1' value: [literal: '1']
+        * symbol: 'NUMBER' literal: '0' value: [literal: '0']
 
-    verif gram, "a1", expected, it
+    verif gram, "a0", expected, it
 
   test 'Should fail to follow symbols' ->
     gram =
