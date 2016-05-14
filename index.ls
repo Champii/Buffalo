@@ -10,7 +10,7 @@ module.exports = (grammarPath, filePath, done) ->
   parse-gram grammarPath, (err, grammar) ->
     return console.error err if err?
 
-    /*inspect \Grammar: grammar*/
+    inspect \Grammar: grammar
 
     fs.read-file filePath, (err, buff) ->
       return done new Error err if err?
@@ -21,8 +21,9 @@ module.exports = (grammarPath, filePath, done) ->
 
       parse-file buff, grammar, done
 
-/*module.exports \./exemples/newLang.gra \./exemples/newLang.file ->
-  inspect &1*/
+module.exports \./exemples/test.gra \./exemples/test.file ->
+  inspect &0, &1
+  &1.print!
 
 /*  epureAst = ->
     it.value = it.value

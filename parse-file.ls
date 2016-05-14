@@ -1,7 +1,7 @@
 if not global.map?
   global import require \prelude-ls
 
-require! fs
+require! { fs, \./Node }
 
 module.exports = (buff, grammar, done) ->
 
@@ -14,7 +14,7 @@ module.exports = (buff, grammar, done) ->
 
     if file-literal.toString! is it
       buff := buff.slice file-literal.length
-      return literal: file-literal.toString!
+      return new Node '' file-literal.toString!
 
     throw new Error 'Unexpected literal: "' + file-literal.toString! + '". Expected: "' + it + '" at "' + buff + '"'
 
@@ -81,20 +81,15 @@ module.exports = (buff, grammar, done) ->
     it
 
   file-get-literal = ->
-    for item, k in it.value
+    for item, k in it.children
       if item?.literal? and it?.literal?
         it.literal += item.literal
 
   file-parse-symbol = (symbol = \S) ->
-    res =
-      symbol: symbol
-      literal: ''
-      value: []
-    res.value = compact map file-parse-item, grammar[symbol]
-    res.value = flatten not-empty res.value
+    res = new Node symbol, '', flatten not-empty compact map file-parse-item, grammar[symbol]
     file-get-literal res
     # log 'Res?' res
-    if not res.value?.length
+    if not res.children?.length
       return false
     res
 
