@@ -4,13 +4,20 @@ gram-items = {}
 
 gram-symbol-repeter = ->
 
+gram-optional = ->
+
 
 gram-line-parse = ->
   res = {}
+  if it.0 is '%'
+    res <<< optional: true
+    it = it[1 to]*''
+
   if it.0 is '"'
-    res = literal: it[1 to elem-index \" tail it]*''
+    res <<< literal: it[1 to elem-index \" tail it]*''
   else
-    res = symbol: it
+    res <<< symbol: it
+
   if it[*-1] in <[ + * ? ]>
     res <<< repeter: it[*-1]
     if res.symbol?
@@ -59,6 +66,44 @@ gram-line-decl = ->
   gram-items[parts.0] = gram-or map gram-line-parse, gram-unescape gram-escape(parts.1).split ' '
 
 stdGram =
+  Character: [
+    or:
+      * symbol: "Alphanum"
+      * symbol: "SpeChar"
+  ]
+  SpeChar: [
+    or:
+      * literal: " "
+      * literal: "/"
+      * literal: "!"
+      * literal: "@"
+      * literal: "#"
+      * literal: "$"
+      * literal: "%"
+      * literal: "^"
+      * literal: "&"
+      * literal: "*"
+      * literal: "("
+      * literal: ")"
+      * literal: "_"
+      * literal: "-"
+      * literal: "="
+      * literal: "+"
+      * literal: "["
+      * literal: "]"
+      * literal: "{"
+      * literal: "}"
+      * literal: "|"
+      * literal: "/"
+      * literal: "?"
+      * literal: "."
+      * literal: ">"
+      * literal: "<"
+      * literal: ","
+      * literal: ";"
+      * literal: ":"
+      * literal: "\\n"
+      * literal: "\\"]
   Alphanum: [
     or:
       * symbol: 'Letter'
@@ -90,7 +135,33 @@ stdGram =
       * literal: "w"
       * literal: "x"
       * literal: "y"
-      * literal: "z"]
+      * literal: "z"
+      * literal: "A"
+      * literal: "B"
+      * literal: "C"
+      * literal: "D"
+      * literal: "E"
+      * literal: "F"
+      * literal: "G"
+      * literal: "H"
+      * literal: "I"
+      * literal: "J"
+      * literal: "K"
+      * literal: "L"
+      * literal: "M"
+      * literal: "N"
+      * literal: "O"
+      * literal: "P"
+      * literal: "Q"
+      * literal: "R"
+      * literal: "S"
+      * literal: "T"
+      * literal: "U"
+      * literal: "V"
+      * literal: "W"
+      * literal: "X"
+      * literal: "Y"
+      * literal: "Z"]
   Digit: [
     or:
       * literal: "0"

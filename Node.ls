@@ -5,7 +5,7 @@ class Node
 
   print: (level = 0) ->
     if @symbol.length
-      console.log "#{repeat level, " "}#{@symbol} #{@literal}"
+      console.log "#{repeat level, " "}#{@symbol} #{@literal.replace /\n/gi ''}"
     map (.print level + 2), @children
 
   left: ->
@@ -21,5 +21,21 @@ class Node
       return child if next
       next = true if child is @
     return null
+
+  contains: (symb) ->
+    if @symbol is symb
+      return true
+    return any (.contains symb), @children
+
+  map: (fn) ->
+    @children = map fn, @children
+    map @~map, @children
+
+  filter: (fn) ->
+    @children = filter fn, @children
+    map (.filter fn), @children
+
+  filterOptional: ->
+    @filter -> not it.optional
 
 module.exports = Node

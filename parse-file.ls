@@ -16,7 +16,7 @@ module.exports = (buff, grammar, done) ->
       buff := buff.slice file-literal.length
       return new Node '' file-literal.toString!
 
-    throw new Error 'Unexpected literal: "' + file-literal.toString! + '". Expected: "' + it + '" at "' + buff + '"'
+    throw new Error "Unexpected literal: '#{file-literal.toString!}'. Expected: '#{it}' at '#{buff}'"
 
   file-parse-or = ->
     throw new Error 'Unexpected end of file' if not buff.length
@@ -68,12 +68,27 @@ module.exports = (buff, grammar, done) ->
     else
       false
 
+  file-parse-optional = ->
+    delete it.optional
+    res = file-parse-item it
+    it.optional = true
+    if is-type \Array res
+      each (.optional = true), res
+    else
+      res.optional = true
+    res
+
   file-parse-item = ->
-    | it.repeter?   => file-parse-repeter it
-    | it.symbol?    => file-parse-symbol it.symbol
-    | it.or?        => file-parse-or it.or
-    | it.literal?   => file-parse-literal it.literal
-    | _             => throw new Error 'PAS SYMBOL'
+    a = {} <<< it
+    if a.optional
+      return file-parse-optional a
+
+    switch
+      | it.repeter?   => file-parse-repeter it
+      | it.symbol?    => file-parse-symbol it.symbol
+      | it.or?        => file-parse-or it.or
+      | it.literal?   => file-parse-literal it.literal
+      | _             => throw new Error 'PAS SYMBOL'
 
   not-empty = ->
     if not it?.length
@@ -86,7 +101,14 @@ module.exports = (buff, grammar, done) ->
         it.literal += item.literal
 
   file-parse-symbol = (symbol = \S) ->
-    res = new Node symbol, '', flatten not-empty compact map file-parse-item, grammar[symbol]
+    node = grammar[symbol]
+      |> map file-parse-item
+      |> compact
+      |> not-empty
+      |> flatten
+
+    res = new Node symbol, '', node
+
     file-get-literal res
     # log 'Res?' res
     if not res.children?.length

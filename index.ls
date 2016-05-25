@@ -22,7 +22,8 @@ module.exports = (grammarPath, filePath, done) ->
       parse-file buff, grammar, done
 
 module.exports \./exemples/test.gra \./exemples/test.file ->
-  inspect &0, &1
+  &1.filterOptional!
+  inspect &1
   &1.print!
 
 /*  epureAst = ->
