@@ -1,6 +1,6 @@
 {
   "name": "tiny-parser",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Grammar parser (CFG)",
   "main": "index.ls",
   "directories": {
