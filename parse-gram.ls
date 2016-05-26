@@ -11,7 +11,11 @@ gram-line-parse = ->
   res = {}
   if it.0 is '%'
     res <<< optional: true
-    it = it[1 to]*''
+    return res <<< gram-line-parse it[1 to]*''
+
+  if it.0 is '!'
+    res <<< replace: true
+    return res <<< gram-line-parse it[1 to]*''
 
   if it.0 is '"'
     res <<< literal: it[1 to elem-index \" tail it]*''
@@ -69,7 +73,9 @@ stdGram =
   Character: [
     or:
       * symbol: "Alphanum"
+        optional: true
       * symbol: "SpeChar"
+        optional: true
   ]
   SpeChar: [
     or:
@@ -107,7 +113,9 @@ stdGram =
   Alphanum: [
     or:
       * symbol: 'Letter'
-      * symbol: 'Digit']
+        optional: true
+      * symbol: 'Digit'
+        optional: true]
   Letter: [
     or:
       * literal: "a"
@@ -174,6 +182,10 @@ stdGram =
       * literal: "7"
       * literal: "8"
       * literal: "9"]
+  Number: [
+    symbol: "Digit"
+    repeter: "+"
+    optional: true]
 
 
 module.exports = (filename, done) ->

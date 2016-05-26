@@ -5,7 +5,13 @@ class Node
 
   print: (level = 0) ->
     if @symbol.length
-      console.log "#{repeat level, " "}#{@symbol} #{@literal.replace /\n/gi ''}"
+      console.log "
+        #{repeat level, " "}
+        #{@symbol}
+      " + " " + if not @children.length or all (-> not it.symbol.length), @children
+        @literal.replace '\n' ''
+      else
+        ""
     map (.print level + 2), @children
 
   left: ->
@@ -29,7 +35,7 @@ class Node
 
   map: (fn) ->
     @children = map fn, @children
-    map @~map, @children
+    map (.map fn), @children
 
   filter: (fn) ->
     @children = filter fn, @children
@@ -37,5 +43,13 @@ class Node
 
   filterOptional: ->
     @filter -> not it.optional
+
+  mapReplace: ->
+    map (.mapReplace!), @children
+
+    @children = @children
+      |> map -> if it.replace => it.children else it
+      |> flatten
+
 
 module.exports = Node

@@ -78,10 +78,22 @@ module.exports = (buff, grammar, done) ->
       res.optional = true
     res
 
+  file-parse-replace = ->
+    delete it.replace
+    res = file-parse-item it
+    it.replace = true
+    if is-type \Array res
+      each (.replace = true), res
+    else
+      res.replace = true
+    res
+
   file-parse-item = ->
     a = {} <<< it
     if a.optional
       return file-parse-optional a
+    if a.replace
+      return file-parse-replace a
 
     switch
       | it.repeter?   => file-parse-repeter it

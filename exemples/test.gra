@@ -1,11 +1,12 @@
 S: Expression+
 
-Expression: Opcode SpaceArg+ %"\n"?
+Expression: Opcode Args %"\n"?
 
+Args: !SpaceArg+
 Opcode: %Letter+
-SpaceArg: %" " Arg
+SpaceArg: %" " !Arg
 
 Arg: Literal | Reg | Deref
 Reg: "a" | "b" | "c" | "d" | "ip"
 Literal: %Digit+
-Deref: %"[" Arg %"]"
+Deref: %"[" !Arg %"]"
