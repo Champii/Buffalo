@@ -19,7 +19,13 @@ module.exports = (grammarPath, filePath, done) ->
       if buff[*-1] is 10
         buff = buff.slice 0, buff.length - 1
 
-      parse-file buff, grammar, done
+      parse-file buff, grammar, (err, res) ->
+        return done err if err?
+
+        res.filterOptional!
+        res.mapReplace!
+
+        done null res
 
 /*module.exports \./exemples/test.gra \./exemples/test.file ->
   return console.error it if it?

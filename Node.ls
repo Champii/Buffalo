@@ -50,6 +50,7 @@ class Node
     @children = @children
       |> map -> if it.replace => it.children else it
       |> flatten
+      |> each ~> it.parent = @
 
 
 module.exports = Node
