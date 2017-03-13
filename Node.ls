@@ -52,5 +52,10 @@ class Node
       |> flatten
       |> each ~> it.parent = @
 
+  firstLeave: ->
+    if not @children.length
+      @
+    else
+      @children.0.firstLeave!
 
 module.exports = Node

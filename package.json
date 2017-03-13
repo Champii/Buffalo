@@ -2,7 +2,7 @@
   "name": "tiny-parser",
   "version": "0.0.6",
   "description": "Grammar parser (CFG)",
-  "main": "index.ls",
+  "main": "index.js",
   "directories": {
     "test": "tests"
   },

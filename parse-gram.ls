@@ -18,7 +18,7 @@ gram-line-parse = ->
     return res <<< gram-line-parse it[1 to]*''
 
   if it.0 is '"'
-    res <<< literal: it[1 to elem-index \" tail it]*''
+    res <<< literal: it[1 to elem-index '"' tail it]*''
   else
     res <<< symbol: it
 
@@ -46,28 +46,45 @@ gram-or = ->
   res
 
 gram-escape = ->
+  i = 0
+  j = 0
+  arr = Array.from(it)
   res = new Buffer it.length
   open = false
-  for l, i in it
-    if l is '"'
+
+  for l in arr
+    if l is '"' and it[i - 1] isnt '\\'
       open = !open
     if open and l is ' '
-      res.writeUInt8 1, i
+      res.writeUInt8 1, j
+      j++
     else if open and l is '='
-      res.writeUInt8 2, i
+      res.writeUInt8 2, j
+      j++
+    else if open and l is '"' and it[i - 1] is '\\'
+      res.writeUInt8 3, j
+      j++
     else
-      res.writeUInt8 l.charCodeAt(0), i
-  res.toString!replace /\\n/g, '\n'
+      res.writeUInt8 l.charCodeAt(0), j
+      j++
+    i++
+
+  final = res.slice(0, j);
+  final.toString!replace /\\n/g, '\n'
 
 gram-unescape = ->
   it |> map ->
     | '\u0001' in it  => it.replace /\001/g, ' '
     | '\u0002' in it  => it.replace /\002/g, '='
+    | '\u0003' in it  => it.replace /\003/g, '"'
     | _               => it
 
 gram-line-decl = ->
   parts = gram-unescape gram-escape(it).split ': '
-  gram-items[parts.0] = gram-or map gram-line-parse, gram-unescape gram-escape(parts.1).split ' '
+  escaped =  gram-escape parts.1
+    |> split ' '
+    |> gram-unescape
+  gram-items[parts.0] = gram-or map gram-line-parse, escaped
 
 stdGram =
   Character: [
@@ -193,7 +210,9 @@ module.exports = (filename, done) ->
     return done err if err?
 
     lines = buff.to-string!split \\n |> filter (.0 isnt '#' and it.length)
+    # console.log('lines', lines)
 
     each gram-line-decl, lines
+    # console.log \GRAM gram-items
     done null, stdGram <<< gram-items
     # inspect gram-items
