@@ -1,7 +1,7 @@
 if not global.map?
   global import require \prelude-ls
 
-require! { fs, \./Node }
+require! { \./Node }
 
 module.exports = (buff, grammar, done) ->
 

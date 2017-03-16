@@ -6,27 +6,24 @@ require! {util, fs, \./parse-gram \./parse-file}
 
 global.inspect = (...args) -> map (-> console.log util.inspect it, depth: null), args
 
-module.exports = (grammarPath, filePath, done) ->
-  parse-gram grammarPath, (err, grammar) ->
-    return console.error err if err?
+module.exports = (grammarDef, input) ->
+  return new Promise (resolve, reject) ->
+    parse-gram grammarDef, (err, grammar) ->
+      return reject err if err?
 
-    # inspect \Grammar: grammar
+      # inspect \Grammar: grammar
 
-    fs.read-file filePath, (err, buff) ->
-      return done new Error err if err?
-      return done new Error "File empty: #{filename}" if not buff.length
+      # if buff[*-1] is 10
+      #   buff = buff.slice 0, buff.length - 1
 
-      if buff[*-1] is 10
-        buff = buff.slice 0, buff.length - 1
-
-      parse-file buff, grammar, (err, res) ->
-        return done err if err?
+      parse-file input, grammar, (err, res) ->
+        return reject err if err?
 
         res.filterOptional!
         res.mapReplace!
         # inspect \res: res
 
-        done null res
+        resolve res
 
 /*module.exports \./exemples/test.gra \./exemples/test.file ->
   return console.error it if it?

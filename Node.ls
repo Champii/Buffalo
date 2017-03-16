@@ -33,6 +33,11 @@ class Node
       return true
     return any (.contains symb), @children
 
+  findSymbol: (symb) ->
+    if @symbol is symb
+      return @
+    return find (.findSymbol symb), @children
+
   map: (fn) ->
     @children = map fn, @children
     map (.map fn), @children
