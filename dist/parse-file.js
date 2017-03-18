@@ -6,7 +6,7 @@
   }
   Node = require('./Node');
   module.exports = function(buff, grammar, done){
-    var fileParseLiteral, fileParseOr, fileParseRepeter, fileParseOptional, fileParseReplace, fileParseItem, notEmpty, fileGetLiteral, fileParseSymbol, ast, e;
+    var fileParseLiteral, fileParseOr, fileParseRepeter, fileParseOptional, fileParseExclude, fileParseReplace, fileParseItem, notEmpty, fileGetLiteral, fileParseSymbol, ast, e;
     if (!buff.length) {
       return done(new Error("File empty"));
     }
@@ -103,6 +103,23 @@
       }
       return res;
     };
+    fileParseExclude = function(it){
+      var res, e;
+      try {
+        res = fileParseItem({
+          symbol: it.exclude,
+          children: it.children
+        });
+        throw false;
+      } catch (e$) {
+        e = e$;
+        if (e === false) {
+          throw false;
+        }
+        delete it.exclude;
+        return fileParseItem(it);
+      }
+    };
     fileParseReplace = function(it){
       var res, this$ = this;
       delete it.replace;
@@ -120,6 +137,9 @@
     fileParseItem = function(it){
       var a;
       a = import$({}, it);
+      if (a.exclude) {
+        return fileParseExclude(a);
+      }
       if (a.optional) {
         return fileParseOptional(a);
       }

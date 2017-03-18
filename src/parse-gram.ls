@@ -2,13 +2,14 @@ require! fs
 
 gram-items = {}
 
-gram-symbol-repeter = ->
-
-gram-optional = ->
-
 
 gram-line-parse = ->
   res = {}
+
+  if (idx = it.indexOf '^') > -1
+    res <<< exclude: it[idx + 1 to]*''
+    return res <<< gram-line-parse it[0 til idx]*''
+
   if it.0 is '%'
     res <<< optional: true
     return res <<< gram-line-parse it[1 to]*''

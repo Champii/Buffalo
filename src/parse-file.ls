@@ -32,6 +32,7 @@ module.exports = (buff, grammar, done) ->
         continue
 
     buff := orig
+
     throw new Error "OR: Unexpected literal at: '#{buff.toString!slice 0 10}'"
 
   file-parse-repeter = ->
@@ -78,6 +79,18 @@ module.exports = (buff, grammar, done) ->
       res.optional = true
     res
 
+  file-parse-exclude = ->
+    try
+      res = file-parse-item symbol: it.exclude, children: it.children
+      throw false
+
+    catch e
+      if e is false
+        throw false
+
+      delete it.exclude
+      return file-parse-item it
+
   file-parse-replace = ->
     delete it.replace
     res = file-parse-item it
@@ -90,6 +103,8 @@ module.exports = (buff, grammar, done) ->
 
   file-parse-item = ->
     a = {} <<< it
+    if a.exclude
+      return file-parse-exclude a
     if a.optional
       return file-parse-optional a
     if a.replace
