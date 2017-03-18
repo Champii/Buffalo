@@ -2,7 +2,7 @@
   "name": "tiny-parser",
   "version": "0.0.6",
   "description": "Grammar parser (CFG)",
-  "main": "index.js",
+  "main": "dist/index.js",
   "directories": {
     "test": "tests"
   },
@@ -13,7 +13,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "mocha -R spec --compilers ls:livescript test"
+    "test": "npm run dist && mocha -R spec --compilers ls:livescript test",
+    "dist": "lsc -c -o dist src/*.ls"
   },
   "repository": {
     "type": "git",

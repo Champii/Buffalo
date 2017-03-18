@@ -4,7 +4,7 @@ test = it
 require! {
   assert
   async
-  \../parse-file
+  \../src/parse-file
 }
 
 verif = (gram, str, expected, done) ->
@@ -12,8 +12,15 @@ verif = (gram, str, expected, done) ->
   parseFile buff, gram, (err, res) ->
     return done err if err?
 
-    if res !== expected
-      return done new Error 'Unexpected result: ' + JSON.stringify(res) + ' \nExpected: ' + JSON.stringify expected
+    res.mapReplace!
+    res.filterOptional!
+    res.map ->
+      delete it.parent
+      it
+
+    if JSON.stringify(res) !== JSON.stringify(expected)
+
+      return done new Error 'Unexpected result\n' + JSON.stringify(res) + ' \nExpected\n' + JSON.stringify expected
 
     done!
 
@@ -32,8 +39,10 @@ describe 'Parsing' ->
     expected =
       symbol: 'S'
       literal: 'a'
-      value:
-        * literal: 'a'
+      children:
+        * symbol: ''
+          literal: 'a'
+          children: []
         ...
 
     verif gram, "a", expected, it
@@ -51,9 +60,13 @@ describe 'Parsing' ->
     expected =
       symbol: 'S'
       literal: 'ab'
-      value:
-        * literal: 'a'
-        * literal: 'b'
+      children:
+        * symbol: ''
+          literal: 'a'
+          children: []
+        * symbol: ''
+          literal: 'b'
+          children: []
 
     verif gram, "ab", expected, it
 
@@ -80,9 +93,13 @@ describe 'Parsing' ->
     expected =
       symbol: 'S'
       literal: 'abcd'
-      value:
-        * literal: 'ab'
-        * literal: 'cd'
+      children:
+        * symbol: ''
+          literal: 'ab'
+          children: []
+        * symbol: ''
+          literal: 'cd'
+          children: []
 
     verif gram, "abcd", expected, it
 
@@ -111,9 +128,21 @@ describe 'Parsing' ->
     expected =
       symbol: 'S'
       literal: 'a0'
-      value:
-        * symbol: 'LETTER' literal: 'a' value: [literal: 'a']
-        * symbol: 'NUMBER' literal: '0' value: [literal: '0']
+      children:
+        * symbol: 'LETTER'
+          literal: 'a'
+          children:
+            * symbol: ''
+              literal: 'a'
+              children: []
+              ...
+        * symbol: 'NUMBER'
+          literal: '0'
+          children:
+            * symbol: ''
+              literal: '0'
+              children: []
+              ...
 
     verif gram, "a0", expected, it
 
@@ -145,7 +174,7 @@ describe 'Parsing' ->
     expected =
       symbol: 'S'
       literal: 'b'
-      value: [literal: 'b']
+      children: [symbol: '' literal: 'b' children: []]
 
     verif gram, "b", expected, it
 
@@ -220,28 +249,28 @@ describe 'Parsing' ->
     expected1 =
       symbol: 'S'
       literal: 'abcz'
-      value:
-        * symbol: 'LETTER' literal: 'a' value: [literal: 'a']
-        * symbol: 'LETTER' literal: 'b' value: [literal: 'b']
-        * symbol: 'LETTER' literal: 'c' value: [literal: 'c']
-        * symbol: 'LETTER' literal: 'z' value: [literal: 'z']
+      children:
+        * symbol: 'LETTER' literal: 'a' children: [symbol: '' literal: 'a' children: []]
+        * symbol: 'LETTER' literal: 'b' children: [symbol: '' literal: 'b' children: []]
+        * symbol: 'LETTER' literal: 'c' children: [symbol: '' literal: 'c' children: []]
+        * symbol: 'LETTER' literal: 'z' children: [symbol: '' literal: 'z' children: []]
 
     expected2 =
       symbol: 'S'
       literal: '487'
-      value:
-        * symbol: 'NUMBER' literal: '4' value: [literal: '4']
-        * symbol: 'NUMBER' literal: '8' value: [literal: '8']
-        * symbol: 'NUMBER' literal: '7' value: [literal: '7']
+      children:
+        * symbol: 'NUMBER' literal: '4' children: [symbol: '' literal: '4' children: []]
+        * symbol: 'NUMBER' literal: '8' children: [symbol: '' literal: '8' children: []]
+        * symbol: 'NUMBER' literal: '7' children: [symbol: '' literal: '7' children: []]
 
     expected3 =
       symbol: 'S'
       literal: '4s8a'
-      value:
-        * symbol: 'NUMBER' literal: '4' value: [literal: '4']
-        * symbol: 'ALPHANUMERIC' literal: 's' value: [symbol: 'LETTER' literal: 's' value: [literal: 's']]
-        * symbol: 'ALPHANUMERIC' literal: '8' value: [symbol: 'NUMBER' literal: '8' value: [literal: '8']]
-        * symbol: 'ALPHANUMERIC' literal: 'a' value: [symbol: 'LETTER' literal: 'a' value: [literal: 'a']]
+      children:
+        * symbol: 'NUMBER' literal: '4' children: [symbol: '' literal: '4' children: []]
+        * symbol: 'ALPHANUMERIC' literal: 's' children: [symbol: 'LETTER' literal: 's' children: [symbol: '' literal: 's' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: '8' children: [symbol: 'NUMBER' literal: '8' children: [symbol: '' literal: '8' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: 'a' children: [symbol: 'LETTER' literal: 'a' children: [symbol: '' literal: 'a' children: []]]
 
     async.auto [
       * -> verif gram, 'abcz', expected1, it
@@ -259,18 +288,18 @@ describe 'Parsing' ->
     expected1 =
       symbol: 'S'
       literal: 'abc'
-      value:
-        * literal: 'a'
-        * literal: 'b'
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'c' children: []
 
 
     expected2 =
       symbol: 'S'
       literal: 'ac'
-      value:
-        * literal: 'a'
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'c' children: []
 
     async.series [
       * -> verif gram, "abc", expected1, it
@@ -302,29 +331,29 @@ describe 'Parsing' ->
     expected1 =
       symbol: 'S'
       literal: 'ac'
-      value:
-        * literal: 'a'
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'c' children: []
 
     expected2 =
       symbol: 'S'
       literal: 'abc'
-      value:
-        * literal: 'a'
-        * literal: 'b'
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'c' children: []
 
     expected3 =
       symbol: 'S'
       literal: 'abbbbbc'
-      value:
-        * literal: 'a'
-        * literal: 'b'
-        * literal: 'b'
-        * literal: 'b'
-        * literal: 'b'
-        * literal: 'b'
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'c' children: []
 
     async.series [
       * -> verif gram, "ac", expected1, it
@@ -356,67 +385,67 @@ describe 'Parsing' ->
     expected1 =
       symbol: 'S'
       literal: ''
-      value: []
+      children: []
 
     expected2 =
       symbol: 'S'
       literal: 'a'
-      value:
-        * literal: 'a'
+      children:
+        * symbol: '' literal: 'a' children: []
         ...
 
     expected3 =
       symbol: 'S'
       literal: 'b'
-      value:
-        * literal: 'b'
+      children:
+        * symbol: '' literal: 'b' children: []
         ...
 
     expected4 =
       symbol: 'S'
       literal: 'c'
-      value:
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'c' children: []
         ...
     expected5 =
       symbol: 'S'
       literal: 'ab'
-      value:
-        * literal: 'a'
-        * literal: 'b'
+      children:
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'b' children: []
 
     expected6 =
       symbol: 'S'
       literal: 'ac'
-      value:
-        * literal: 'a'
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'c' children: []
 
     expected7 =
       symbol: 'S'
       literal: 'abc'
-      value:
-        * literal: 'a'
-        * literal: 'b'
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'c' children: []
 
     expected8 =
       symbol: 'S'
       literal: 'aacc'
-      value:
-        * literal: 'a'
-        * literal: 'a'
-        * literal: 'c'
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'c' children: []
+        * symbol: '' literal: 'c' children: []
 
     expected9 =
       symbol: 'S'
       literal: 'bbcc'
-      value:
-        * literal: 'b'
-        * literal: 'b'
-        * literal: 'c'
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'c' children: []
+        * symbol: '' literal: 'c' children: []
 
     async.series [
       * -> verif gram, 'a', expected2, it
@@ -439,22 +468,22 @@ describe 'Parsing' ->
     expected2 =
       symbol: 'S'
       literal: 'abc'
-      value:
-        * literal: 'a'
-        * literal: 'b'
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'c' children: []
 
     expected3 =
       symbol: 'S'
       literal: 'abbbbbc'
-      value:
-        * literal: 'a'
-        * literal: 'b'
-        * literal: 'b'
-        * literal: 'b'
-        * literal: 'b'
-        * literal: 'b'
-        * literal: 'c'
+      children:
+        * symbol: '' literal: 'a' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'b' children: []
+        * symbol: '' literal: 'c' children: []
 
     async.series [
       * -> verif gram, "abc", expected2, it
@@ -530,16 +559,16 @@ describe 'Parsing' ->
     expected =
       symbol: 'S'
       literal: '{a5bv98z}'
-      value:
-        * literal: '{'
-        * symbol: 'ALPHANUMERIC' literal: 'a' value: [symbol: 'LETTER' literal: 'a' value: [literal: 'a']]
-        * symbol: 'ALPHANUMERIC' literal: '5' value: [symbol: 'NUMBER' literal: '5' value: [literal: '5']]
-        * symbol: 'ALPHANUMERIC' literal: 'b' value: [symbol: 'LETTER' literal: 'b' value: [literal: 'b']]
-        * symbol: 'ALPHANUMERIC' literal: 'v' value: [symbol: 'LETTER' literal: 'v' value: [literal: 'v']]
-        * symbol: 'ALPHANUMERIC' literal: '9' value: [symbol: 'NUMBER' literal: '9' value: [literal: '9']]
-        * symbol: 'ALPHANUMERIC' literal: '8' value: [symbol: 'NUMBER' literal: '8' value: [literal: '8']]
-        * symbol: 'ALPHANUMERIC' literal: 'z' value: [symbol: 'LETTER' literal: 'z' value: [literal: 'z']]
-        * literal: '}'
+      children:
+        * symbol: '' literal: '{' children: []
+        * symbol: 'ALPHANUMERIC' literal: 'a' children: [symbol: 'LETTER' literal: 'a' children: [symbol: '' literal: 'a' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: '5' children: [symbol: 'NUMBER' literal: '5' children: [symbol: '' literal: '5' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: 'b' children: [symbol: 'LETTER' literal: 'b' children: [symbol: '' literal: 'b' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: 'v' children: [symbol: 'LETTER' literal: 'v' children: [symbol: '' literal: 'v' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: '9' children: [symbol: 'NUMBER' literal: '9' children: [symbol: '' literal: '9' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: '8' children: [symbol: 'NUMBER' literal: '8' children: [symbol: '' literal: '8' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: 'z' children: [symbol: 'LETTER' literal: 'z' children: [symbol: '' literal: 'z' children: []]]
+        * symbol: '' literal: '}' children: []
 
     verif gram, "{a5bv98z}", expected, it
 
@@ -656,15 +685,15 @@ describe 'Parsing' ->
     expected =
       symbol: 'S'
       literal: '{a5bv98z}'
-      value:
-        * literal: '{'
-        * symbol: 'ALPHANUMERIC' literal: 'a' value: [symbol: 'LETTER' literal: 'a' value: [literal: 'a']]
-        * symbol: 'ALPHANUMERIC' literal: '5' value: [symbol: 'NUMBER' literal: '5' value: [literal: '5']]
-        * symbol: 'ALPHANUMERIC' literal: 'b' value: [symbol: 'LETTER' literal: 'b' value: [literal: 'b']]
-        * symbol: 'ALPHANUMERIC' literal: 'v' value: [symbol: 'LETTER' literal: 'v' value: [literal: 'v']]
-        * symbol: 'ALPHANUMERIC' literal: '9' value: [symbol: 'NUMBER' literal: '9' value: [literal: '9']]
-        * symbol: 'ALPHANUMERIC' literal: '8' value: [symbol: 'NUMBER' literal: '8' value: [literal: '8']]
-        * symbol: 'ALPHANUMERIC' literal: 'z' value: [symbol: 'LETTER' literal: 'z' value: [literal: 'z']]
-        * literal: '}'
+      children:
+        * symbol: '' literal: '{' children: []
+        * symbol: 'ALPHANUMERIC' literal: 'a' children: [symbol: 'LETTER' literal: 'a' children: [symbol: '' literal: 'a' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: '5' children: [symbol: 'NUMBER' literal: '5' children: [symbol: '' literal: '5' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: 'b' children: [symbol: 'LETTER' literal: 'b' children: [symbol: '' literal: 'b' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: 'v' children: [symbol: 'LETTER' literal: 'v' children: [symbol: '' literal: 'v' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: '9' children: [symbol: 'NUMBER' literal: '9' children: [symbol: '' literal: '9' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: '8' children: [symbol: 'NUMBER' literal: '8' children: [symbol: '' literal: '8' children: []]]
+        * symbol: 'ALPHANUMERIC' literal: 'z' children: [symbol: 'LETTER' literal: 'z' children: [symbol: '' literal: 'z' children: []]]
+        * symbol: '' literal: '}' children: []
 
     verif gram, "{a5bv98z}", expected, it
