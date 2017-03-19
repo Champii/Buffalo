@@ -126,6 +126,8 @@ stdGram =
       * literal: ","
       * literal: ";"
       * literal: ":"
+      # * literal: "'"
+      * literal: "\""
       * literal: "\\n"
       * literal: "\\"]
   Alphanum: [
@@ -206,11 +208,9 @@ stdGram =
     optional: true]
 
 
-module.exports = (grammarDef, done) ->
+module.exports = (grammarDef) ->
   lines = grammarDef.to-string!split \\n |> filter (.0 isnt '#' and it.length)
-  # console.log('lines', lines)
 
   each gram-line-decl, lines
-  # console.log \GRAM gram-items
-  done null, stdGram <<< gram-items
+  stdGram <<< gram-items
   # inspect gram-items

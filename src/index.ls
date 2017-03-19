@@ -7,23 +7,21 @@ require! {util, fs, \./parse-gram \./parse-file}
 global.inspect = (...args) -> map (-> console.log util.inspect it, depth: null), args
 
 module.exports = (grammarDef, input) ->
-  return new Promise (resolve, reject) ->
-    parse-gram grammarDef, (err, grammar) ->
-      return reject err if err?
+  grammar = parse-gram grammarDef
+  # inspect \Grammar: grammar
 
-      # inspect \Grammar: grammar
+  # if buff[*-1] is 10
+  #   buff = buff.slice 0, buff.length - 1
 
-      # if buff[*-1] is 10
-      #   buff = buff.slice 0, buff.length - 1
+  [err, res] = parse-file input, grammar
 
-      parse-file input, grammar, (err, res) ->
-        return reject err if err?
+  return err if err?
 
-        res.filterOptional!
-        res.mapReplace!
-        # inspect \res: res
+  res.filterOptional!
+  res.mapReplace!
+  # inspect \res: res
 
-        resolve res
+  res
 
 /*module.exports \./exemples/test.gra \./exemples/test.file ->
   return console.error it if it?

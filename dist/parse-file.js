@@ -5,10 +5,10 @@
     import$(global, require('prelude-ls'));
   }
   Node = require('./Node');
-  module.exports = function(buff, grammar, done){
+  module.exports = function(buff, grammar){
     var fileParseLiteral, fileParseOr, fileParseRepeter, fileParseOptional, fileParseExclude, fileParseReplace, fileParseItem, notEmpty, fileGetLiteral, fileParseSymbol, ast, e;
     if (!buff.length) {
-      return done(new Error("File empty"));
+      return [new Error("File empty")];
     }
     fileParseLiteral = function(it){
       var fileLiteral;
@@ -195,12 +195,12 @@
       ast = fileParseSymbol();
     } catch (e$) {
       e = e$;
-      return done(new Error(e));
+      return [new Error(e)];
     }
     if (buff.length) {
-      return done(new Error("Expected end of file: " + buff));
+      return [new Error("Expected end of file: " + buff)];
     }
-    return done(null, ast);
+    return [null, ast];
   };
   function import$(obj, src){
     var own = {}.hasOwnProperty;

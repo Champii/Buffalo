@@ -9,27 +9,27 @@ require! {
 
 verif = (gram, str, expected, done) ->
   buff = new Buffer str
-  parseFile buff, gram, (err, res) ->
-    return done err if err?
+  [err, res] = parseFile buff, gram
 
-    res.mapReplace!
-    res.filterOptional!
-    res.map ->
-      delete it.parent
-      it
+  return done err if err?
 
-    if JSON.stringify(res) !== JSON.stringify(expected)
+  res.mapReplace!
+  res.filterOptional!
+  res.map ->
+    delete it.parent
+    it
 
-      return done new Error 'Unexpected result\n' + JSON.stringify(res) + ' \nExpected\n' + JSON.stringify expected
+  if JSON.stringify(res) !== JSON.stringify(expected)
+    return done new Error 'Unexpected result\n' + JSON.stringify(res) + ' \nExpected\n' + JSON.stringify expected
 
-    done!
+  done!
 
 fail = (gram, str, done) ->
   buff = new Buffer str
-  parseFile buff, gram, (err, res) ->
-    return done! if err?
+  [err, res] = parseFile buff, gram
+  return done! if err?
 
-    done new Error "Should have failed"
+  done new Error "Should have failed"
 
 describe 'Parsing' ->
 

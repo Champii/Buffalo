@@ -21,21 +21,15 @@
     }, args);
   };
   module.exports = function(grammarDef, input){
-    return new Promise(function(resolve, reject){
-      return parseGram(grammarDef, function(err, grammar){
-        if (err != null) {
-          return reject(err);
-        }
-        return parseFile(input, grammar, function(err, res){
-          if (err != null) {
-            return reject(err);
-          }
-          res.filterOptional();
-          res.mapReplace();
-          return resolve(res);
-        });
-      });
-    });
+    var grammar, ref$, err, res;
+    grammar = parseGram(grammarDef);
+    ref$ = parseFile(input, grammar), err = ref$[0], res = ref$[1];
+    if (err != null) {
+      return err;
+    }
+    res.filterOptional();
+    res.mapReplace();
+    return res;
   };
   /*module.exports \./exemples/test.gra \./exemples/test.file ->
     return console.error it if it?

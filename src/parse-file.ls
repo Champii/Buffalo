@@ -3,9 +3,9 @@ if not global.map?
 
 require! { \./Node }
 
-module.exports = (buff, grammar, done) ->
+module.exports = (buff, grammar) ->
 
-  return done new Error "File empty" if not buff.length
+  return [new Error "File empty"] if not buff.length
 
   file-parse-literal = ->
     throw new Error 'Unexpected end of file' if not buff.length
@@ -145,9 +145,9 @@ module.exports = (buff, grammar, done) ->
   try
     ast = file-parse-symbol!
   catch e
-    return done new Error e
+    return [new Error e]
 
   if buff.length
-    return done new Error "Expected end of file: #{buff}"
+    return [new Error "Expected end of file: #{buff}"]
 
-  done null, ast
+  [null, ast]

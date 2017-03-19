@@ -179,6 +179,8 @@
         }, {
           literal: ":"
         }, {
+          literal: "\""
+        }, {
           literal: "\\n"
         }, {
           literal: "\\"
@@ -336,14 +338,14 @@
       optional: true
     }]
   };
-  module.exports = function(grammarDef, done){
+  module.exports = function(grammarDef){
     var lines, this$ = this;
     lines = filter(function(it){
       return it[0] !== '#' && it.length;
     })(
     grammarDef.toString().split('\n'));
     each(gramLineDecl, lines);
-    return done(null, import$(stdGram, gramItems));
+    return import$(stdGram, gramItems);
   };
   function import$(obj, src){
     var own = {}.hasOwnProperty;
